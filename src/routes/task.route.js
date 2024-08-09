@@ -7,6 +7,7 @@ const {
   postTask,
   updateTask,
   deleteTask,
+  searchTaskByTitle,
 } = require("../controllers/task.controller");
 
 const {
@@ -14,14 +15,25 @@ const {
   validateTaskUpdateMiddleWare,
 } = require("../middleware/validator.middleware");
 
+const validateObjectID = require("../middleware/validateObjectID.middleware");
+const authenticate = require("../middleware/auth.middleware");
+
+taskRouter.get("/search", searchTaskByTitle);
+
 taskRouter.get("/", getAllTasks);
 
-taskRouter.get("/:id", getSingleTask);
+taskRouter.get("/:id", validateObjectID, getSingleTask);
 
-taskRouter.post("/", validateTaskPostMiddleWare, postTask);
+taskRouter.post("/", authenticate, validateTaskPostMiddleWare, postTask);
 
-taskRouter.put("/:id", validateTaskUpdateMiddleWare, updateTask);
+taskRouter.put(
+  "/:id",
+  authenticate,
+  validateObjectID,
+  validateTaskUpdateMiddleWare,
+  updateTask
+);
 
-taskRouter.delete("/:id", deleteTask);
+taskRouter.delete("/:id", authenticate, deleteTask);
 
 module.exports = taskRouter;

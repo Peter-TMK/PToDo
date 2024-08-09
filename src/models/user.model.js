@@ -5,7 +5,7 @@ const UserSchema = new Schema(
   {
     username: {
       type: String,
-      required: true,
+      //   required: true,
       unique: true,
     },
     email: {
@@ -17,6 +17,7 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+
     tasks: [
       {
         type: Schema.Types.ObjectId,
@@ -26,5 +27,13 @@ const UserSchema = new Schema(
   },
   { timestamps: true }
 );
+
+UserSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
 
 module.exports = mongoose.model("User", UserSchema);

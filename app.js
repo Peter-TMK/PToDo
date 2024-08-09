@@ -4,14 +4,17 @@ const connectDB = require("./src/config/database");
 const errorHandler = require("./src/config/errorHandler");
 // const TaskModel = require("./src/models/task.model");
 const taskRouter = require("./src/routes/task.route");
+const authRouter = require("./src/routes/auth.route");
+const userRouter = require("./src/routes/user.route");
 
-const {
-  getAllTasks,
-  getSingleTask,
-  postTask,
-  updateTask,
-  deleteTask,
-} = require("./src/controllers/task.controller");
+// const {
+//   getAllTasks,
+//   getSingleTask,
+//   postTask,
+//   updateTask,
+//   deleteTask,
+// } = require("./src/controllers/task.controller");
+
 // const userModel = require("./src/models/user.model");
 
 const app = express();
@@ -34,5 +37,8 @@ app.use(
 );
 
 app.use("/api/task", taskRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
+
 app.use(errorHandler);
 module.exports = app;
