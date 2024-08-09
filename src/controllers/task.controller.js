@@ -46,13 +46,13 @@ const updateTask = async (req, res, next) => {
   const { title, description, status } = req.body;
 
   try {
-    const task = await TaskModel.findByIdAndUpdate(
+    const updateTask = await TaskModel.findByIdAndUpdate(
       id,
       { title, description, status },
       { new: true }
     );
 
-    const updateTask = await TaskModel.findById(id);
+    // const updateTask = await TaskModel.findById(id);
     if (!updateTask) {
       res.status(404).send(`Article with id:${id} not found!`);
     }
@@ -78,10 +78,56 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
+const searchTaskByTitle = async (req, res, next) => {
+  const { title, status, sortBy, order, page = 1, limit = 2 } = req.query;
+
+  let sortOptions = {};
+
+  if (sortBy) {
+    sortOptions[sortBy] = order === "desc" ? -1 : 1;
+  }
+
+  const skip = (page - 1) * limit;
+
+  try {
+    const filter = {};
+
+    if (title) {
+      filter.title = {
+        $regex: title,
+        $options: "i",
+      };
+    }
+
+    if (status) {
+      filter.status = {
+        // $regex: tags,
+        $in: status.split(","),
+      };
+    }
+    const totalTasks = await TaskModel.countDocuments(filter);
+
+    const tasks = await TaskModel.find(filter)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(Number(limit));
+
+    res.status(200).json({
+      total: totalTasks,
+      page: Number(page),
+      pages: Math.ceil(totalTasks / limit),
+      tasks,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllTasks,
   getSingleTask,
   postTask,
   updateTask,
   deleteTask,
+  searchTaskByTitle,
 };
