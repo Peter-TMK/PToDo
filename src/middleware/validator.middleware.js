@@ -1,5 +1,6 @@
 const joi = require("joi");
 const TaskModel = require("../models/task.model");
+const UserModel = require("../models/user.model");
 
 const uniqueTaskTitle = async (value, helper) => {
   const existingTaskTitle = await TaskModel.findOne({ title: value });
@@ -9,13 +10,13 @@ const uniqueTaskTitle = async (value, helper) => {
   return value;
 };
 
-// const uniqueEmail = async (value, helper) => {
-//   const existingTaskTitle = await TaskModel.findOne({ title: value });
-//   if (existingTaskTitle) {
-//     throw new Error("Each Task's Title Must Be Unique!");
-//   }
-//   return value;
-// };
+const uniqueEmail = async (value, helper) => {
+  const existingTaskTitle = await UserModel.findOne({ email: value });
+  if (existingTaskTitle) {
+    throw new Error("Each User's Email Must Be Unique!");
+  }
+  return value;
+};
 
 const validateTaskPost = joi.object({
   title: joi.string().min(3).max(50).required().external(uniqueTaskTitle),
@@ -68,16 +69,20 @@ const validateRegister = joi.object({
     .email({
       minDomainSegments: 2,
       tlds: { allow: ["com", "net", "org", "ng", "co", "za", "uk"] },
-    }),
+    })
+    .external(uniqueEmail),
   password: joi.string().required(),
 });
 
 const validateUserUpdate = joi.object({
   // email: Joi.string().required().email(),
-  email: joi.string().email({
-    minDomainSegments: 2,
-    tlds: { allow: ["com", "net", "org", "ng", "co", "za", "uk"] },
-  }),
+  email: joi
+    .string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "net", "org", "ng", "co", "za", "uk"] },
+    })
+    .external(uniqueEmail),
   // password: joi.string().required(),
 });
 
