@@ -17,7 +17,12 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
-
+    refreshToken: {
+      type: String,
+      // Optional: If you want to store the refresh token directly in the user model
+    },
+    resetToken: { type: String },
+    resetTokenExpiration: { type: Date },
     tasks: [
       {
         type: Schema.Types.ObjectId,
@@ -33,6 +38,7 @@ UserSchema.set("toJSON", {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
+    delete returnedObject.password;
   },
 });
 
